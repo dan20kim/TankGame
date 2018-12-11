@@ -1,5 +1,6 @@
 #include <iostream>
 #include <ncurses.h>
+#include <cstring>
 #include <string>
 #include <curses.h>
 #include <stdio.h>
@@ -7,20 +8,22 @@
 #include <vector>
 #include <windows.h>
 #include <math.h>
-
+#include <time.h>
 #define PI 3.14159265359
 
 using namespace std;
 class Tank{
 private:
+  string name;
   int health;
   int speed;
   int position;
   char symbol;
 public:
   Tank();
-  Tank(int initHealth, int initSpeed, int initPosition, char initSymbol);
+  Tank(string initName, int initHealth, int initSpeed, int initPosition, char initSymbol);
   ~Tank();
+  string getName();
   int getHealth();
   int getSpeed();
   int getPosition();
@@ -33,13 +36,15 @@ public:
 };
 
 Tank::Tank(){
+  name = "Tank";
   health = 3;
   speed = 1;
   position = 0;
   symbol = 'P';
 }
 
-Tank::Tank(int initHealth, int initSpeed, int initPosition, char initSymbol){
+Tank::Tank(string initName, int initHealth, int initSpeed, int initPosition, char initSymbol){
+  name = initName;
   health = initHealth;
   speed = initSpeed;
   position = initPosition;
@@ -48,6 +53,10 @@ Tank::Tank(int initHealth, int initSpeed, int initPosition, char initSymbol){
 
 Tank::~Tank(){
   cout << "dead" << endl;
+}
+
+string Tank::getName(){
+  return this->name;
 }
 
 int Tank::getHealth(){
@@ -154,14 +163,19 @@ void initTank(Tank &computer, vector<vector<char>> &board);
 void initBoard(int row, int col, vector<vector<char>> &board);
 void drawBoard(vector<vector<char>> &board, Tank &player, Tank &computer);
 int playerTurn(Tank &player, Tank &computer, vector<vector<char>> &board);
+int computerTurn(Tank &player, Tank &computer, vector<vector<char>> &board);
 void moveRight(Tank &tank, vector<vector<char>> &board);
 void moveLeft(Tank &tank, vector<vector<char>> &board);
 int drawPath(Bullet &bullet, vector<vector<char>> &board, Tank &player, Tank &computer);
+
+
 
 int main(){
   int row, col;
   struct winsize w;
   int win = 0;
+  char flush;
+  srand(time(NULL));
   initscr();
   //raw();
   noecho();
@@ -170,10 +184,10 @@ int main(){
   row = w.ws_row-10;
   col = w.ws_col-10;
   //printw("row:%d col:%d\n", w.ws_row, w.ws_col);
-  Tank player = Tank(3, 3, 0, 'P');
+  Tank player = Tank("Bill Gates", 3, 3, 0, 'P');
   vector<vector<char>> board;
   initBoard(row, col, board);
-  Tank computer = Tank(3,1,board[0].size()-10, 'C');
+  Tank computer = Tank("Steve Jobs", 3,5,board[0].size()-10, 'C');
   initTank(player, board);
   initTank(computer, board);
   drawBoard(board, player, computer);
@@ -181,6 +195,35 @@ int main(){
     clear();
     drawBoard(board, player, computer); 
     win = playerTurn(player, computer, board);
+    if (win == 1){  
+      win = 0;
+      if (computer.getHealth() == 1){
+        clear();
+        //computer.~Tank();
+        mvprintw((board.size()/2)+1, (board[0].size()/2)+1,"YOU WIN");
+        refresh();
+        win = 1;
+        break;
+      }
+      computer.decreaseHealth();
+    }
+    //while ((flush = getchar()) != '\n' && flush != EOF);
+    initBoard(row, col, board);
+    initTank(player, board);
+    initTank(computer, board);
+    win = computerTurn(player, computer, board);
+    if (win == 1){  
+      win = 0;
+      if (player.getHealth() == 1){
+        clear();
+        //computer.~Tank();
+        mvprintw((board.size()/2)+1, (board[0].size()/2)+1,"YOU LOSE");
+        refresh();
+        win = 1;
+      }
+      player.decreaseHealth();
+    }
+    initBoard(row, col, board);
     initTank(player, board);
     initTank(computer, board);
     refresh();
@@ -259,15 +302,15 @@ void drawBoard(vector<vector<char>> &board, Tank &player, Tank &computer){
 }
 
 int playerTurn(Tank &player, Tank &computer, vector<vector<char>> &board){
-  char choice = 'l';
+  char choice = ' ';
   double power;
   double angle;
   int win;
   echo();
-  printw("\nWhat would you like to do? ");
+  printw("What would you like to do? (r/l/s): ");
   do {
     choice = getch();
-  } while (choice != 'l' && choice != 'r' && choice != 's');
+  }while (choice != 'l' && choice != 'r' && choice != 's');
     if (choice == 'l'){
       moveLeft(player, board);
     }
@@ -276,12 +319,12 @@ int playerTurn(Tank &player, Tank &computer, vector<vector<char>> &board){
     }
     else if (choice == 's'){
       noraw();
-      printw("\nEnter a power ");
+      printw("\nEnter a power(0-30): ");
       do{
         scanw("%lf", &power);
       } while(power<0 || power > 30);
       printw("\n%lf", power);
-      printw("\nEnter an angle ");
+      printw("\nEnter an angle(0-90): ");
       do{
         scanw("%lf", &angle);
       } while(angle<0 || angle > 90);
@@ -294,32 +337,47 @@ int playerTurn(Tank &player, Tank &computer, vector<vector<char>> &board){
   return win;
 }
 
-int drawPath(Bullet &bullet, vector<vector<char>> &board, Tank &player, Tank &computer){
+int computerTurn(Tank &player, Tank &computer, vector<vector<char>> &board){
+  double angle, power;
+  int win = 0;
+  int choice = rand() % 3;
+  int distance = computer.getPosition() - player.getPosition()-3; // -3 because the bullet actually starts above the tank. This means it has to travel "less" of distance to get to the appropriate distance.
+  if (choice == 0){
+    moveLeft(computer, board);
+  }
+  else if (choice == 1){
+    moveRight(computer, board);
+  }
+  else if (choice == 2){
+    angle = rand() % 30 + 120;
+    power = sqrt(20*.0981*distance/-sin(2*PI*angle/180)); // Initial Velocity Formula - I need to multiply by 20 because the acceleration is /20 in the update bullet.
+    Bullet cShot = Bullet(power, angle, computer.getPosition(), board.size()-2);
+    win = drawPath(cShot, board, computer, player);
+  }
+  return win;
+  
+}
+
+int drawPath(Bullet &bullet, vector<vector<char>> &board, Tank &shooter, Tank &enemy){
   int win = 0;
   if (bullet.getYPosition() >= 0 && bullet.getYPosition() < board.size() && bullet.getXPosition() >= 0 && bullet.getXPosition() < board[0].size()){
     board[(int)bullet.getYPosition()][(int)bullet.getXPosition()] = 'O';
-    clear();
-    drawBoard(board, player, computer);
+    erase();
+    drawBoard(board, shooter, enemy);
     refresh();
   }
   Sleep(10);
   board[(int)bullet.getYPosition()][(int)bullet.getXPosition()] = ' ';
-  if ((int)bullet.getXPosition() == computer.getPosition() && (int)bullet.getYPosition() == board.size()-1){    
-    printw("YOU HIT HIM");
+  if ((int)bullet.getXPosition() == enemy.getPosition() && (int)bullet.getYPosition() == board.size()-1){    
+    printw("%s got hit", enemy.getName().c_str());
     refresh();
     Sleep(1000);
-    if (computer.getHealth() == 1){
-      clear();
-      //computer.~Tank();
-      mvprintw((board.size()/2)+1, (board[0].size()/2)+1,"YOU WIN");
-      refresh();
-      return 1;
-    }
-    computer.decreaseHealth();
+    bullet.~Bullet();
+    return 1;
   }
   bullet.updateBullet();
-  if (bullet.getYPosition() >= 0 && bullet.getYPosition() < board.size() && bullet.getXPosition() >= 0 && bullet.getXPosition() < board[0].size()){
-    win = drawPath(bullet, board, player, computer);
+  if ((int)bullet.getYPosition() > 0 && (int)bullet.getYPosition() < board.size() && (int)bullet.getXPosition() >= 0 && (int)bullet.getXPosition() < board[0].size()){
+    win = drawPath(bullet, board, shooter, enemy);
   }
   return win;
 }
