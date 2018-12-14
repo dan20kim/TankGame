@@ -2,9 +2,13 @@
 Tank game with physics simulations
 
 Author: Daniel Kim
+
 Professor: Hong
+
 Class: ECE-160
+
 Project Name: Tank Game Final Project
+
 Date: 12/14/18
 
 Compilation steps:
