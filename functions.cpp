@@ -113,7 +113,6 @@ int playerTurn(Tank &player, Tank &computer, vector<vector<char>> &board, int an
       do{
         scanw("%lf", &power);
       } while(power<0 || power > 30);
-      //printw("\n%lf", power);
       printw("Enter an angle(0-90): ");
       do{
         scanw("%lf", &angle);
@@ -122,7 +121,6 @@ int playerTurn(Tank &player, Tank &computer, vector<vector<char>> &board, int an
       printw("%lf", angle);
       Bullet pShot = Bullet(power, angle, player.getPosition(), board.size()-2);
       win = drawPath(pShot, board, player, computer);
-      //pShot.~Bullet();
       raw();
     } 
   return win;
