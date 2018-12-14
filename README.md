@@ -16,6 +16,9 @@ make clean
 To run program:
 ./game.exe
 
+Dependencies:
+You will need to have the NCurses library as well as the Windows.h library installed in order to be able to run this program
+
 Gameplay:
 The game will prompt whether you want to play against the computer (1 player) or against someone else (2 player)
 If you choose 1 player, you will input a name, a character, and a difficulty (0 hardest, 3 easiest)
