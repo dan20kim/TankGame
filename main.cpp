@@ -1,6 +1,13 @@
 #include "main.h"
-using namespace std;
 
+/* Author: Daniel Kim
+ * Professor: Hong
+ * Class: ECE-160
+ * Project Name: Tank Game Final Project
+ * Date: 12/14/18 */
+
+
+using namespace std;
 int main(){
   //Initialize Variables
   int row, col;
@@ -108,7 +115,6 @@ int main(){
     getchar();
     endwin();
   }
-  //cout << y << x << endl;
   return 0;
 }
 

@@ -1,4 +1,4 @@
-#ifndef tankincluded
+#ifndef tankincluded // include only if not included before
 #define tankincluded
 
 #include <string>

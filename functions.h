@@ -1,11 +1,9 @@
-//#include <iostream>
 #include <ncurses.h>
 #include <cstring>
 #include <string>
 #include <stdio.h>
 #include <vector>
 #include <windows.h>
-//#include <math.h>
 #include <time.h>
 #include "tank.h"
 #include "bullet.h"

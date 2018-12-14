@@ -7,7 +7,6 @@ void winCondition(Tank &tank, string winMessage, int *win, vector<vector<char>> 
     *win = 0;
     if (tank.getHealth() == 1){
       erase();
-      //computer.~Tank();
       mvprintw((board.size()/2)+1, (board[0].size()/2)+1, winMessage.c_str());
       refresh();
       *win = 1;

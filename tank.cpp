@@ -1,6 +1,11 @@
 #include "tank.h"
 using namespace std;
-/* Tanks are */
+/* Tanks are created whenever
+ * a player or a computer is made.
+ * This would be done at the start of
+ * each game. Tanks have a name, as well
+ * as health, speed, position, and symbol
+ * attributes */
 
 // Default Tank Constructor
 Tank::Tank(){

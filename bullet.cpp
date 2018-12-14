@@ -36,7 +36,7 @@ Bullet::~Bullet(){
 void Bullet::updateBullet(){
   xPosition += .05*xPower; // Multiplied by .05 so that the xPosition and yPosition
   yPosition -= .05*yPower; // increment in small intervals. This makes the curve look more realistic
-  yPower -= .0981; // Gravitational Constant
+  yPower -= .0981; // Gravitational Constant, each time the bullet is updated, the yVelocity is decreased by .0981
 }
 
 double Bullet::getPower(){
